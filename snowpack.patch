@@ -1,0 +1,68 @@
+diff --git a/Source/snowpack/snowpack/plugins/SmetIO.cc b/Source/snowpack/snowpack/plugins/SmetIO.cc
+index 4517266..2407e03 100644
+--- a/Source/snowpack/snowpack/plugins/SmetIO.cc
++++ b/Source/snowpack/snowpack/plugins/SmetIO.cc
+@@ -998,7 +998,7 @@ std::string SmetIO::getFieldsHeader(const SnowStation& Xdata) const
+ 	if (out_soileb)
+ 		os << "dIntEnergySoil meltFreezeEnergySoil ColdContentSoil" << " ";
+ 	if (out_mass)
+-		os << "SWE MS_Water MS_Wind MS_Rain MS_SN_Runoff MS_Soil_Runoff MS_Sublimation MS_Evap MS_melt MS_freeze" << " ";	// 34-39: SWE (kg m-2), LWC (kg m-2), eroded mass (kg m-2 h-1), rain rate (kg m-2 h-1), runoff at bottom of snowpack (kg m-2), runoff at bottom of soil (kg m-2), sublimation and evaporation (both in kg m-2), mass melt, mass freeze (kg m^2); see also 52 & 93.
++		os << "SWE MS_Water MS_Water0-0.1 MS_Water0-0.25 MS_Water0-0.5 MS_Water0-1 MS_Water0-2 MS_Wind MS_Rain MS_SN_Runoff MS_Soil_Runoff MS_Sublimation MS_Evap MS_melt MS_freeze" << " ";	// 34-39: SWE (kg m-2), LWC (kg m-2), eroded mass (kg m-2 h-1), rain rate (kg m-2 h-1), runoff at bottom of snowpack (kg m-2), runoff at bottom of soil (kg m-2), sublimation and evaporation (both in kg m-2), mass melt, mass freeze (kg m^2); see also 52 & 93.
+ 														// Note: in operational mode, runoff at bottom of snowpack is expressed as kg m-2 h-1 when !cumsum_mass.
+ 	if (out_dhs)
+ 		os << "MS_Snow_dHS MS_Sublimation_dHS MS_Settling_dHS MS_Erosion_dHS MS_Redeposit_dHS MS_Redeposit_dRHO" << " "; // snow height change from sublimation (mm), snow height change from settling (mm), snow height change from redeposition mode (mm), density change from redeposition mode (kg/m^3).
+@@ -1103,11 +1103,11 @@ void SmetIO::writeTimeSeriesHeader(const SnowStation& Xdata, const double& tz, s
+ 	}
+ 	if (out_mass) {
+ 		//"SWE MS_Water MS_Wind MS_Rain MS_SN_Runoff MS_Soil_Runoff MS_Sublimation MS_Evap"
+-		plot_description << "snow_water_equivalent  total_amount_of_water  erosion_mass_loss  rain_rate  virtual_lysimeter  virtual_lysimeter_under_the_soil  sublimation_mass  evaporated_mass  mass_melt  mass_refreeze" << " ";
+-		plot_units << "kg/m2 kg/m2 kg/m2/h kg/m2/h kg/m2 kg/m2 kg/m2 kg/m2 kg/m2 kg/m2" << " ";
+-		units_offset << "0 0 0 0 0 0 0 0 0 0" << " ";
+-		units_multiplier << "1 1 1 1 1 1 1 1 1 1" << " ";
+-		plot_color << "0x3300FF 0x0000FF 0x99CCCC 0x3333 0x0066CC 0x003366 0xCCFFFF 0xCCCCFF 0xFF0000 0x0000FF" << " ";
++		plot_description << "snow_water_equivalent  total_amount_of_water  total_amount_of_water_0_0.1m  total_amount_of_water_0_0.25m  total_amount_of_water_0_0.5m  total_amount_of_water_0_1m  total_amount_of_water_0_2m   erosion_mass_loss  rain_rate  virtual_lysimeter  virtual_lysimeter_under_the_soil  sublimation_mass  evaporated_mass  mass_melt  mass_refreeze" << " ";
++		plot_units << "kg/m2 kg/m2 kg/m2 kg/m2 kg/m2 kg/m2 kg/m2 kg/m2/h kg/m2/h kg/m2 kg/m2 kg/m2 kg/m2 kg/m2 kg/m2" << " ";
++		units_offset << "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" << " ";
++		units_multiplier << "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" << " ";
++		plot_color << "0x3300FF 0x0000FF 0x0000FF 0x0000FF 0x0000FF 0x0000FF 0x0000FF 0x99CCCC 0x3333 0x0066CC 0x003366 0xCCFFFF 0xCCCCFF 0xFF0000 0x0000FF" << " ";
+ 		plot_min << "" << " ";
+ 		plot_max << "" << " ";
+ 	}
+@@ -1261,8 +1261,37 @@ void SmetIO::writeTimeSeriesData(const SnowStation& Xdata, const SurfaceFluxes&
+ 	}
+ 
+ 	if (out_mass) {
++		double lwc1=0.;
++		double lwc2=0.;
++		double lwc3=0.;
++		double lwc4=0.;
++		double lwc5=0.;
++		double tmpH=0.;
++		for(size_t ii = Xdata.getNumberOfElements(); ii --> Xdata.SoilNode; ) {
++			if(tmpH<0.1) {
++				lwc1+=Xdata.Edata[ii].theta[WATER]*Xdata.Edata[ii].L;
++			}
++			if(tmpH<0.25) {
++				lwc2+=Xdata.Edata[ii].theta[WATER]*Xdata.Edata[ii].L;
++			}
++			if(tmpH<0.5) {
++				lwc3+=Xdata.Edata[ii].theta[WATER]*Xdata.Edata[ii].L;
++			}
++			if(tmpH<1.) {
++				lwc4+=Xdata.Edata[ii].theta[WATER]*Xdata.Edata[ii].L;
++			}
++			if(tmpH<2.) {
++				lwc5+=Xdata.Edata[ii].theta[WATER]*Xdata.Edata[ii].L;
++			}
++			tmpH+=Xdata.Edata[ii].L;
++		}
+ 		data.push_back( Sdata.mass[SurfaceFluxes::MS_SWE]/cos_sl );
+ 		data.push_back( Sdata.mass[SurfaceFluxes::MS_WATER]/cos_sl );
++		data.push_back( lwc1/cos_sl );
++		data.push_back( lwc2/cos_sl );
++		data.push_back( lwc3/cos_sl );
++		data.push_back( lwc4/cos_sl );
++		data.push_back( lwc5/cos_sl );
+ 		data.push_back( Sdata.mass[SurfaceFluxes::MS_WIND]/cos_sl );
+ 		data.push_back( Sdata.mass[SurfaceFluxes::MS_RAIN] );
+ 		data.push_back( Sdata.mass[SurfaceFluxes::MS_SNOWPACK_RUNOFF]/cos_sl );
