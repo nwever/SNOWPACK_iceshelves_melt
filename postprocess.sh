@@ -13,10 +13,10 @@ fi
 process () {
 	# Postprocess output
 	ll=($(cat to_exec.lst.iceshelves | awk '{print $5}' | sed 's/cfgfiles\///' | awk -F.ini '{print $1}'))
-        pushd ${zipdir_snowpackoutput}
-        for l in ${ll[*]}
-        do
-                z="${l}_MERRA2.zip"
+	pushd ${zipdir_snowpackoutput}
+	for l in ${ll[*]}
+	do
+		z="${l}_MERRA2.zip"
 		echo "Processing: ${z}"
 		f="$(basename -- ${z} .zip).smet"
 		f2="$(basename -- ${z} .zip).pro"
