@@ -1,6 +1,7 @@
 iceshelves="$(grep -v ^# points_ice_shelves_4.45km.txt | awk -F, '{print $NF}' | sort -nu)"
 regions="$(seq 1 8)"
-lt=1	# Use local time (1), or UTC time (0)?
+lt=1		# Use local time (1), or UTC time (0)?
+fullday=0	# Analyze 24 hr, 00:00-00:00 (1), or restrict analysis between 6:00-10:00 and 18:00-22:00 (0)?
 
 #
 # Days with melt
@@ -63,14 +64,14 @@ do
 			echo "Processing region=${region}, th=${th}..."
 			outfile="./stats/${label}_${th}mm_R${region}.txt"
 			bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2_water.txt \
-			$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); hrmin=100*(hr*100+min); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th && (mm>=11 || mm<=3)) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000)) {s+=$col; k++}; idx=sprintf("%d,%d", i, yr); dd_old=dd}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+			$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); hrmin=100*(hr*100+min); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th && (mm>=11 || mm<=3)) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000) || fd==1) {s+=$col; k++}; idx=sprintf("%d,%d", i, yr); dd_old=dd}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
 		done
 		for iceshelf in ${iceshelves}
 		do
 			echo "Processing iceshelf=${iceshelf}, th=${th}..."
 			outfile="./stats_iceshelves/${label}_${th}mm_S${iceshelf}.txt"
 			bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2_water.txt \
-			$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); yr=substr((lt)?($3):($1),1,4); hrmin=100*(hr*100+min); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th && (mm>=11 || mm<=3)) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000)) {s+=$col; k++}; idx=sprintf("%d,%d", i, yr); dd_old=dd}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+			$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); yr=substr((lt)?($3):($1),1,4); hrmin=100*(hr*100+min); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th && (mm>=11 || mm<=3)) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000) || fd==1) {s+=$col; k++}; idx=sprintf("%d,%d", i, yr); dd_old=dd}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
 		done
 	done
 done
