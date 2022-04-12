@@ -39,7 +39,7 @@ do
 	echo "Processing iceshelf=${iceshelf}..."
 	outfile="./stats_iceshelves/melt_S${iceshelf}.txt"
 	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2.txt \
-	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr((lt)?($3):($1),1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr($1,1,4); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; idx=sprintf("%d,%d", i, yr); if(mm>=11 || mm<=3) {s[idx]+=(($9>0)?($9):(0))}}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr($1,1,4); if(mm>=11) {yr++}; years[yr]=yr; pp[i]=i; idx=sprintf("%d,%d", i, yr); if(mm>=11 || mm<=3) {s[idx]+=(($9>0)?($9):(0))}}} END {ny=asorti(years); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%d", years[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%d", pp[i], years[y]); printf " %d", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
 done
 
 #
