@@ -92,3 +92,21 @@ do
 		done
 	done
 done
+
+#
+# FAC (*_firn.txt files)
+#
+for region in ${regions}
+do
+	echo "Processing region=${region}..."
+	outfile="./stats_per_day${sfx}/fac_R${region}.txt"
+	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_firn.txt \
+	$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {hr=substr((lt)?($3):($1),12,2); dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); fac=$7-(($6-$5)/917.)-($5/1000.); if(hr==12) {s[idx]=fac}}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+done
+for iceshelf in ${iceshelves}
+do
+	echo "Processing iceshelf=${iceshelf}..."
+	outfile="./stats_iceshelves_per_day${sfx}/fac_S${iceshelf}.txt"
+	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_firn.txt \
+	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {hr=substr((lt)?($3):($1),12,2); dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); fac=$7-(($6-$5)/917.)-($5/1000.); if(hr==12) {s[idx]=fac}}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+done
