@@ -30,14 +30,14 @@ do
 		echo "Processing region=${region}, th=${th}..."
 		outfile="./stats_per_day${sfx}/meltdays_${th}mm_R${region}.txt"
 		bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2.txt \
-		$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -v melt_th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; if(dd!=dd_old) {if(s>melt_th) {n[idx]++}; s=0}; s+=($9>0)?($9):(0); idx=sprintf("%d,%08d", i, yrmmdd); dd_old=dd}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+		$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -v melt_th=${th} -f days_with_melt_per_day.awk | Rscript calc_avg.R > ${outfile}
 	done
 	for iceshelf in ${iceshelves}
 	do
 		echo "Processing iceshelf=${iceshelf}, th=${th}..."
 		outfile="./stats_iceshelves_per_day${sfx}/meltdays_${th}mm_S${iceshelf}.txt"
 		bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2.txt \
-		$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -v melt_th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; if(dd!=dd_old) {if(s>melt_th) {n[idx]++}; s=0}; s+=($9>0)?($9):(0); idx=sprintf("%d,%08d", i, yrmmdd); dd_old=dd}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+		$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -v melt_th=${th} -f days_with_melt_per_day.awk | Rscript calc_avg.R > ${outfile}
 	done
 done
 
@@ -49,14 +49,14 @@ do
 	echo "Processing region=${region}..."
 	outfile="./stats_per_day${sfx}/melt_R${region}.txt"
 	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2.txt \
-	$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); s[idx]+=(($9>0)?($9):(0))}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+	$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -f total_melt_per_day.awk | Rscript calc_avg.R > ${outfile}
 done
 for iceshelf in ${iceshelves}
 do
 	echo "Processing iceshelf=${iceshelf}..."
 	outfile="./stats_iceshelves_per_day${sfx}/melt_S${iceshelf}.txt"
 	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2.txt \
-	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); s[idx]+=(($9>0)?($9):(0))}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -f total_melt_per_day.awk | Rscript calc_avg.R > ${outfile}
 done
 
 #
@@ -81,14 +81,14 @@ do
 			echo "Processing region=${region}, th=${th}..."
 			outfile="./stats_per_day${sfx}/${label}_${th}mm_R${region}.txt"
 			bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2_water.txt \
-			$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); hrmin=100*(hr*100+min); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000) || fd==1) {s+=$col; k++}; idx=sprintf("%d,%08d", i, yrmmdd); dd_old=dd}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+			$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} -f liquid_water_in_firn_per_day.awk | Rscript calc_avg.R > ${outfile}
 		done
 		for iceshelf in ${iceshelves}
 		do
 			echo "Processing iceshelf=${iceshelf}, th=${th}..."
 			outfile="./stats_iceshelves_per_day${sfx}/${label}_${th}mm_S${iceshelf}.txt"
 			bash concatenate.sh postprocess/LATLON_MERRA2.zip *_MERRA2_water.txt \
-			$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); hr=substr((lt)?($3):($1),12,2); min=substr((lt)?($3):($1),15,2); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); hrmin=100*(hr*100+min); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; if(dd!=dd_old) {if(k>0 && (s/k)>th) {n[idx]++}; s=0; k=0}; if((hrmin>=60000 && hrmin<=100000) || (hrmin>=180000 && hrmin<=220000) || fd==1) {s+=$col; k++}; idx=sprintf("%d,%08d", i, yrmmdd); dd_old=dd}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+			$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v col=${i} -v lt=${lt} -v fd=${fullday} -v th=${th} -f liquid_water_in_firn_per_day.awk | Rscript calc_avg.R > ${outfile}
 		done
 	done
 done
@@ -101,12 +101,12 @@ do
 	echo "Processing region=${region}..."
 	outfile="./stats_per_day${sfx}/fac_R${region}.txt"
 	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_firn.txt \
-	$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {hr=substr((lt)?($3):($1),12,2); dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); fac=$7-(($6-$5)/917.)-($5/1000.); if(hr==12) {s[idx]=fac}}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+	$(grep -v ^# points_regions_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -f fac_per_day.awk | Rscript calc_avg.R > ${outfile}
 done
 for iceshelf in ${iceshelves}
 do
 	echo "Processing iceshelf=${iceshelf}..."
 	outfile="./stats_iceshelves_per_day${sfx}/fac_S${iceshelf}.txt"
 	bash concatenate.sh postprocess/LATLON_MERRA2.zip *_firn.txt \
-	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} 'BEGIN {yr=-1; dd=-1} {if(substr($1,1,1)=="#") {if(yr!=-1) {i++}; yr=-1} else {hr=substr((lt)?($3):($1),12,2); dd=substr((lt)?($3):($1),9,2); mm=substr((lt)?($3):($1),6,2); yr=substr((lt)?($3):($1),1,4); yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd); yrmmdds[yrmmdd]=yrmmdd; pp[i]=i; idx=sprintf("%d,%08d", i, yrmmdd); fac=$7-(($6-$5)/917.)-($5/1000.); if(hr==12) {s[idx]=fac}}} END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %.3f", (idx in s)?(s[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
+	$(grep -v ^# points_ice_shelves_4.45km.txt | sed -e 's/\.88,/.875,/g' -e 's/\.38,/.375,/g' -e 's/\.12,/.125,/g' -e 's/\.62,/.625,/g' | awk -v sel=${iceshelf} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -f fac_per_day.awk | Rscript calc_avg.R > ${outfile}
 done
