@@ -19,7 +19,7 @@ BEGIN {
 	} else {
 		# Split date in day, month, year
 		dd=substr((lt)?($3):($1),9,2);
-		mm=substr((lt)?($3):($1),6,2); 
+		mm=substr((lt)?($3):($1),6,2);
 		yr=substr((lt)?($3):($1),1,4);
 		if(mm>=11) {
 			# Take care of the definition of melt year, running from November to March
@@ -51,7 +51,7 @@ BEGIN {
 		dd_old=dd;
 		mm_old=mm;
 	}
-} 
+}
 END {
 	# Generate output
 	ny=asort(years);	# Make sure we loop over the years in sequence

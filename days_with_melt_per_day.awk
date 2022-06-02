@@ -22,7 +22,7 @@ BEGIN {
 		yr=substr((lt)?($3):($1),1,4);
 		yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd);
 		# store the dates
-		yrmmdds[yrmmdd]=yrmmdd; 
+		yrmmdds[yrmmdd]=yrmmdd;
 		# Store the site numbers
 		pp[i]=i;
 		# If we move to a new day, check for idx is necessary so that this is skipped for the very first data point

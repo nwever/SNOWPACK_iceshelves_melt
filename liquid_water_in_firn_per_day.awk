@@ -19,7 +19,7 @@ BEGIN {
 	} else {
 		# Split date in day, month, year
 		dd=substr((lt)?($3):($1),9,2);
-		mm=substr((lt)?($3):($1),6,2); 
+		mm=substr((lt)?($3):($1),6,2);
 		yr=substr((lt)?($3):($1),1,4);
 		yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd);
 		# Split time in hr, min
@@ -47,7 +47,7 @@ BEGIN {
 		# Keep track of the day we are summing melt over
 		dd_old=dd;
 	}
-} 
+}
 END {
 	# Take care of the last data point
 	if(k>0 && (s/k)>th) {

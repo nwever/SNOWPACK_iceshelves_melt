@@ -32,7 +32,7 @@ BEGIN {
 			s[idx]+=(($9>0)?($9):(0));
 		}
 	}
-} 
+}
 END {
 	# Generate output
 	ny=asort(years);	# Make sure we loop over the years in sequence

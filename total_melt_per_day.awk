@@ -17,7 +17,7 @@ BEGIN {
 		dd=substr((lt)?($3):($1),9,2);
 		mm=substr((lt)?($3):($1),6,2);
 		yr=substr((lt)?($3):($1),1,4);
-		yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd);		  
+		yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd);
 		# store the dates
 		yrmmdds[yrmmdd]=yrmmdd;
 		# Store the site numbers
@@ -25,9 +25,9 @@ BEGIN {
 		# Set the index to store the information
 		idx=sprintf("%d,%08d", i, yrmmdd);
 		# Sum the melt
-		s[idx]+=(($9>0)?($9):(0))}}
+		s[idx]+=(($9>0)?($9):(0));
 	}
-} 
+}
 END {
 	# Generate output
 	ny=asort(yrmmdds);	# Make sure we loop over the years in sequence
