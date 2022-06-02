@@ -1,5 +1,3 @@
-awk -v sel=${region} -F, '{if($3==sel) {print $1 "," $2}}') | awk -v lt=${lt} -v melt_th=${th} '
-if(dd!=dd_old) {END {ny=asorti(yrmmdds); ni=asorti(pp); for(y=1; y<=ny; y++) {printf("%08d", yrmmdds[y]); for(i=1; i<=ni; i++) {idx=sprintf("%d,%08d", pp[i], yrmmdds[y]); printf " %d", (idx in n)?(n[idx]):(0)}; printf "\n"}}' | Rscript calc_avg.R > ${outfile}
 #!/usr/bin/awk -f 
 # Note: this script should be called after setting:
 #  -v lt=<local time>		(0=no, use UTC, 1=yes, use local time)
