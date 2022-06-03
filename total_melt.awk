@@ -41,7 +41,7 @@ END {
 		printf("%d", years[y]);
 		for(i=1; i<=ni; i++) {	# Loop over sites
 			idx=sprintf("%d,%d", pp[i], years[y]);
-			printf " %d", (idx in n)?(s[idx]):(0)
+			printf " %d", (idx in s)?(s[idx]):(0)
 		}
 		printf "\n";
 	}
