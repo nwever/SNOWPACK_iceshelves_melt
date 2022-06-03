@@ -14,9 +14,9 @@ BEGIN {
 		yr=-1
 	} else {
 		# Split date in day, month, year
-		dd=substr((lt)?($3):($1),9,2);
-		mm=substr((lt)?($3):($1),6,2);
-		yr=substr((lt)?($3):($1),1,4);
+		dd=int(substr((lt)?($3):($1),9,2));
+		mm=int(substr((lt)?($3):($1),6,2));
+		yr=int(substr((lt)?($3):($1),1,4));
 		yrmmdd=sprintf("%04d%02d%02d", yr, mm, dd);
 		# store the dates
 		yrmmdds[yrmmdd]=yrmmdd;

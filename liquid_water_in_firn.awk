@@ -18,16 +18,16 @@ BEGIN {
 		yr=-1
 	} else {
 		# Split date in day, month, year
-		dd=substr((lt)?($3):($1),9,2);
-		mm=substr((lt)?($3):($1),6,2);
-		yr=substr((lt)?($3):($1),1,4);
+		dd=int(substr((lt)?($3):($1),9,2));
+		mm=int(substr((lt)?($3):($1),6,2));
+		yr=int(substr((lt)?($3):($1),1,4));
 		if(mm>=11) {
 			# Take care of the definition of melt year, running from November to March
 			yr++;
 		};
 		# Split time in hr, min
-		hr=substr((lt)?($3):($1),12,2);
-		min=substr((lt)?($3):($1),15,2);
+		hr=int(substr((lt)?($3):($1),12,2));
+		min=int(substr((lt)?($3):($1),15,2));
 		hrmin=100*(hr*100+min);
 		# store the years
 		years[yr]=yr;
