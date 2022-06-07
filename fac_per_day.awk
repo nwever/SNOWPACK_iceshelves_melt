@@ -3,7 +3,7 @@
 #  -v lt=<local time>		(0=no, use UTC, 1=yes, use local time)
 BEGIN {
 	yr=-1;
-
+}
 {
 	# Check if we get to a new site (first line starts with #)
 	if(substr($1,1,1)=="#") {
