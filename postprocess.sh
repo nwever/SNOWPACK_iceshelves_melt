@@ -1,7 +1,8 @@
 export TZ=UTC
 zipdir_snowpackoutput="${HOME}/zip/"
 postprocessdir="${HOME}/postprocess/"
-snowpack_tools_dir=${HOME}/snowpack/Source/snowpack/tools/"
+snowpack_tools_dir="${HOME}/snowpack/Source/snowpack/tools/"
+experiment_tag="ICESHELVES"
 
 # Check if mawk exist, otherwise create alias
 shopt -s expand_aliases         # Make sure aliases work in non-interactive shells
@@ -16,7 +17,7 @@ process () {
 	pushd ${zipdir_snowpackoutput}
 	for l in ${ll[*]}
 	do
-		z="${l}_MERRA2.zip"
+		z="${l}_${experiment_tag}.zip"
 		echo "Processing: ${z}"
 		f="$(basename -- ${z} .zip).smet"
 		f2="$(basename -- ${z} .zip).pro"
