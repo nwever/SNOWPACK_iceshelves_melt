@@ -1,7 +1,7 @@
 iceshelves="$(grep -v ^# points_ice_shelves_4.45km.txt | awk -F, '{print $NF}' | sort -nu)"
 regions="$(seq 1 8)"
 smetdir=/pl/active/icesheetsclimate/IDS_Antarctica/smet/
-lt=0		# Use local time (1), or UTC time (0)?
+lt=0		# Use local time (1), or UTC time (0)?	NOTE: local time not yet supported (would require to read in longitude and do the time transformations)
 
 # Set suffix
 sfx=""
