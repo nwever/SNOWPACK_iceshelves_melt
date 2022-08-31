@@ -1,7 +1,7 @@
 iceshelves="$(grep -v ^# points_ice_shelves_4.45km.txt | awk -F, '{print $NF}' | sort -nu)"
 regions="$(seq 1 8)"
 smetdir=/pl/active/icesheetsclimate/IDS_Antarctica/smet/
-lt=1		# Use local time (1), or UTC time (0)?
+lt=0		# Use local time (1), or UTC time (0)?
 
 # Set suffix
 sfx=""
@@ -9,7 +9,7 @@ sfx=""
 
 # Create paths, if they don't yet exist
 if [ ! -d "./monthlystats${sfx}/" ]; then
-	mkdir ./stats${sfx}/
+	mkdir ./monthlystats${sfx}/
 fi
 if [ ! -d "./monthlystats_iceshelves${sfx}/" ]; then
 	mkdir ./monthlystats_iceshelves${sfx}/
