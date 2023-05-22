@@ -3,7 +3,7 @@ regions="$(seq 1 8)"
 experiment_tag="ICESHELVES"
 lt=1		# Use local time (1), or UTC time (0)?
 fullday=0	# Analyze 24 hr, 00:00-00:00 (1), or restrict analysis between 6:00-10:00 and 18:00-22:00 (0)?
-dowhat=$1	# To be used wih job arrays: provide 1-4 as first command line arugment, or leave empty to execute all
+dowhat=$1	# To be used wih job arrays: provide 1-4 as first command line argument, or leave empty to execute all
 
 # Set suffix
 if (( ${fullday} )); then
