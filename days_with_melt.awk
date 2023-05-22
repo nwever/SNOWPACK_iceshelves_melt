@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f 
 # Note: this script should be called after setting:
 #  -v lt=<local time>		(0=no, use UTC, 1=yes, use local time)
-#  -v th=<threshold>		(threshold to use for the average of col)
+#  -v melt_th=<threshold>	(threshold to use for the average of col)
 BEGIN {
 	yr=-1;
 	dd_old=-1;
